@@ -1,35 +1,19 @@
-from flask import Flask, request,url_for, redirect,session,Response
+from flask import Flask, request,url_for, redirect,session,Response, render_template
+
 app = Flask(__name__)
-app.secret_key = 'supersecret'
-@app.route('/', methods=['GET', 'POST'])
+
+@app.route('/')
 def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        if username == 'admin' and password == '123':
-            session['username'] = username
-            return redirect(url_for('welcome'))
-        else:
-            return Response('Invalid credentials', mimetype='text/plain')
-    return '''
-    <h1>Login</h1>
-        <form method="POST">
-            Username: <input type="text" name="username" placeholder="Username"><br>
-            Password: <input type="password" name="password" placeholder="Password"><br>
-            <input type="submit" value="Login">
-        </form>
-    ''' 
-@app.route('/welcome')
-def welcome():
-    if 'username' in session:
-        return f'''
-        <h1>Welcome, {session["username"]}!</h1>
-        <a href="{url_for('logout')}">Logout</a>
-        
-        
-        '''
-    return redirect(url_for('login'))
-@app.route('/logout')
-def logout():
-    session.pop('username', None)
-    return redirect(url_for('login'))
+    return render_template('login.html')
+@app.route("/submit", methods=["POST"])
+def submit():
+    username = request.form.get("username")
+    password = request.form.get("password")
+    # if username == "admin" and password == "123":
+    #     return render_template('welcome.html', username=username)
+    valid_users = {"admin": "123", "user1": "abc", "user2": "xyz"}
+    if username in valid_users and password == valid_users[username]: 
+        return render_template('welcome.html', username=username)
+    
+    else:        
+        return "Invalid credenrtials. Please try again."
